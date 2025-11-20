@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking System</title>
+    <link rel="stylesheet" href="basic.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-parking"></i>
+            <span>SmartPark</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#dashboard" class="nav-link active">Dashboard</a>
+            <a href="#parking" class="nav-link">Parking</a>
+            <a href="#rental" class="nav-link">Rental</a>
+            <a href="#wallet" class="nav-link">Wallet</a>
+            <a href="#bookings" class="nav-link">Bookings</a>
+            <a href="#profile" class="nav-link">Profile</a>
+        </div>
+        <div class="nav-user">
+            <span id="username"></span>
+            <button id="themeToggle" class="btn-secondary" title="Toggle theme">Dark mode</button>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <h2>Dashboard</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('dashboard')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('dashboard')">Export PDF</button>
+            </div>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Current Parking</h3>
+                    <div class="parking-status">
+                        <span class="status-indicator active"></span>
+                        <span>Slot A-12</span>
+                    </div>
+                    <div class="timer" id="parkingTimer">
+                        <i class="fas fa-clock"></i>
+                        <span id="timerDisplay">00:00:00</span>
+                    </div>
+                    <div class="current-charge">
+                        <span>Current Charge: ₹<span id="currentCharge">0.00</span></span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Wallet Balance</h3>
+                    <div class="balance">
+                        <i class="fas fa-wallet"></i>
+                        <span>₹<span id="walletBalance">150.00</span></span>
+                    </div>
+                    <button class="btn-primary" onclick="addFunds()">Add Funds</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <button class="btn-secondary" onclick="findParking()">Find Parking</button>
+                    <button class="btn-secondary" onclick="preBookSlot()">Pre-book Slot</button>
+                    <button class="btn-secondary" onclick="viewHistory()">View History</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parking Section -->
+        <section id="parking" class="section">
+            <h2>Parking Management</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('parking')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('parking')">Export PDF</button>
+            </div>
+            <div class="parking-container">
+                <div class="parking-map">
+                    <h3>Parking Lot Map</h3>
+                    <div class="parking-grid" id="parkingGrid">
+                        <!-- Parking slots will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="parking-info">
+                    <h3>Parking Information</h3>
+                    <div class="info-card">
+                        <p><strong>Total Slots:</strong> <span id="totalSlots">50</span></p>
+                        <p><strong>Available:</strong> <span id="availableSlots">35</span></p>
+                        <p><strong>Occupied:</strong> <span id="occupiedSlots">15</span></p>
+                        <p><strong>Rate:</strong> ₹10/hour</p>
+                      <h4>Filter by Vehicle</h4>
+      <label><input type="checkbox" id="car"> Car</label>
+      <label><input type="checkbox" id="bike"> Bike</label>
+      <label><input type="checkbox" id="ev"> EV</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rental Section -->
+        <section id="rental" class="section">
+            <h2>Slot Rental</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('rental')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('rental')">Export PDF</button>
+            </div>
+            <div class="rental-container">
+                <div class="rental-map">
+                    <h3>Available Slots for Rental</h3>
+                    <div class="rental-grid" id="rentalGrid">
+                        <!-- Rental slots will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="rental-info">
+                    <h3>Rental Information</h3>
+                    <div class="info-card">
+                        <p><strong>Total Slots:</strong> <span id="rentalTotalSlots">50</span></p>
+                        <p><strong>Available for Rental:</strong> <span id="rentalAvailableSlots">30</span></p>
+                        <p><strong>Currently Rented:</strong> <span id="rentedSlots">5</span></p>
+                        <p><strong>Daily Rate:</strong> ₹100/day</p>
+                        <p><strong>Weekly Rate:</strong> ₹600/week (14% discount)</p>
+                        <p><strong>Monthly Rate:</strong> ₹2500/month (17% discount)</p>
+                    </div>
+                    
+                    <div class="rental-filters">
+                        <h4>Filter by Vehicle Type</h4>
+                        <label><input type="checkbox" id="rentalCar"> Car</label>
+                        <label><input type="checkbox" id="rentalBike"> Bike</label>
+                        <label><input type="checkbox" id="rentalEv"> EV</label>
+                    </div>
+                    
+                    <div class="rental-duration">
+                        <h4>Rental Duration</h4>
+                        <label><input type="radio" name="duration" value="daily" checked> Daily (₹100)</label>
+                        <label><input type="radio" name="duration" value="weekly"> Weekly (₹600)</label>
+                        <label><input type="radio" name="duration" value="monthly"> Monthly (₹2500)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rental-form-container">
+                <div class="rental-form">
+                    <h3>Rent a Slot</h3>
+                    <form id="rentalForm">
+                        <div class="form-group">
+                            <label for="rentalSlot">Selected Slot</label>
+                            <input type="text" id="rentalSlot" placeholder="Select a slot from the map above" readonly required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rentalDuration">Rental Duration</label>
+                            <select id="rentalDuration" required>
+                                <option value="">Select Duration</option>
+                                <option value="daily">Daily (₹100)</option>
+                                <option value="weekly">Weekly (₹600)</option>
+                                <option value="monthly">Monthly (₹2500)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle Number</label>
+                            <input type="text" id="rentalVehicleNumber" placeholder="ABC-1234" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactNumber">Contact Number</label>
+                            <input type="tel" id="contactNumber" placeholder="+91-9876543210" required>
+                        </div>
+                        
+                        <div class="rental-summary">
+                            <h4>Rental Summary</h4>
+                            <div class="summary-item">
+                                <span>Slot:</span>
+                                <span id="summarySlot">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Duration:</span>
+                                <span id="summaryDuration">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Total Cost:</span>
+                                <span id="summaryCost">₹0</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Rent Slot</button>
+                    </form>
+                </div>
+                
+                <div class="active-rentals">
+                    <h3>Active Rentals</h3>
+                    <div class="rentals-list" id="rentalsList">
+                        <!-- Active rentals will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wallet Section -->
+        <section id="wallet" class="section">
+            <h2>Wallet Management</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('wallet')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('wallet')">Export PDF</button>
+            </div>
+            <div class="wallet-container">
+                <div class="wallet-balance-card">
+                    <h3>Current Balance</h3>
+                    <div class="balance-display">
+                        <span class="balance-amount">₹<span id="walletDisplayBalance">150.00</span></span>
+                    </div>
+                    <div class="wallet-actions">
+                        <button class="btn-primary" onclick="showAddFundsModal()">Add Funds</button>
+                        <button class="btn-secondary" onclick="showWithdrawModal()">Withdraw</button>
+                    </div>
+                </div>
+                
+                <div class="transaction-history">
+                    <h3>Transaction History</h3>
+                    <div class="transaction-list" id="transactionList">
+                        <!-- Transactions will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bookings Section -->
+        <section id="bookings" class="section">
+            <h2>Pre-booking</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('bookings')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('bookings')">Export PDF</button>
+            </div>
+            <div class="bookings-container">
+                <div class="booking-form">
+                    <h3>Book a Parking Slot</h3>
+                    <form id="bookingForm">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <select id="location" required>
+                                <option value="">Select Location</option>
+                                <option value="mall">Shopping Mall</option>
+                                <option value="stadium">Stadium</option>
+                                <option value="airport">Airport</option>
+                                <option value="hospital">Hospital</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="startTime">Start Time</label>
+                            <input type="time" id="startTime" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="duration">Duration (hours)</label>
+                            <input type="number" id="duration" min="1" max="24" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle Number</label>
+                            <input type="text" id="vehicleNumber" placeholder="ABC-1234" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Book Slot</button>
+                    </form>
+                </div>
+                
+                <div class="active-bookings">
+                    <h3>Active Bookings</h3>
+                    <div class="bookings-list" id="bookingsList">
+                        <!-- Active bookings will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <h2>User Profile</h2>
+            <div class="export-toolbar">
+                <button class="btn-secondary" onclick="exportSectionAsPNG('profile')">Export PNG</button>
+                <button class="btn-secondary" onclick="exportSectionAsPDF('profile')">Export PDF</button>
+            </div>
+            <div class="profile-container">
+                <div class="profile-info">
+                    <h3>Personal Information</h3>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" value="John Doe" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" value="john@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" value="+1-555-0123" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" rows="3">123 Main St, City, State</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Update Profile</button>
+                    </form>
+                </div>
+                
+                <div class="vehicles-info">
+                    <h3>Registered Vehicles</h3>
+                    <div class="vehicles-list" id="vehiclesList">
+                        <!-- Vehicles will be populated here -->
+                    </div>
+                    <button class="btn-secondary" onclick="addVehicle()">Add Vehicle</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="addFundsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add Funds to Wallet</h3>
+            <form id="addFundsForm">
+                <div class="form-group">
+                    <label for="amount">Amount (₹)</label>
+                    <input type="number" id="amount" min="10" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <select id="paymentMethod" required>
+                        <option value="card">Credit/Debit Card</option>
+                        <option value="paypal">UPI</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Add Funds</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script src="basic.js"></script>
+
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("pm_current"));
+
+    if (!user) {
+      // no user → send back to login
+      window.location.href = "login.html"; 
+      return;
+    }
+
+    document.getElementById("username").textContent = user.fullname;
+  });
+</script>
+</body>
+</html>
