@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Park Minus</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">🚗</div>
+      <div class="brand-text">Park Minus</div>
+    </div>
+
+    <nav class="nav">
+      <button id="signInBtn" class="btn btn-ghost">Sign In</button>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <main class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-title">Smart Parking<br>Made Simple</h1>
+      <p class="subtitle">
+        Find, book, and manage parking spots effortlessly. Your complete parking solution in one platform.
+      </p>
+
+      <div class="cta">
+        <button id="getStartedBtn" class="btn btn-primary">Get Started</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature"><div class="ico">⚡</div><div class="f-text">Fast Booking</div></div>
+    <div class="feature"><div class="ico">⏱️</div><div class="f-text">Real-time Availability</div></div>
+    <div class="feature"><div class="ico">🔒</div><div class="f-text">Secure Payments</div></div>
+    <div class="feature"><div class="ico">🚘</div><div class="f-text">Vehicle Management</div></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">© Park Minus</footer>
+
+
+  <!-- MODAL -->
+  <div id="authModal" class="modal">
+    <div class="modal-panel">
+      <button id="closeModal" class="modal-close">&times;</button>
+
+      <h2>Create account / Sign in</h2>
+      <p class="muted small">We store only demo info — no backend.</p>
+
+      <form id="authForm">
+
+        <label>Full name *</label>
+        <input id="fullname">
+
+        <label>Phone number *</label>
+        <input id="phone">
+
+        <label>Email *</label>
+        <input id="email">
+
+        <label>Vehicle number *</label>
+        <input id="vehno">
+
+        <label>Vehicle RC</label>
+        <input id="rc">
+
+        <label>Driver's Licence</label>
+        <input id="dl">
+
+        <label>Password *</label>
+        <input id="password" type="password">
+
+        <label>Confirm password *</label>
+        <input id="password2" type="password">
+
+        <div id="formMessage" class="msg"></div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:10px;">
+          Create account & Sign in
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>
